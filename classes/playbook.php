@@ -45,9 +45,9 @@ class playbook extends base_playbook {
         $play->play();
 
         // Install plugins
-        if (!$this->has_role('moodle_dev_env') {
-        $play = new install_plugins($this->load_plugins_to_install());
-        $play->play();
+        if (!$this->has_role('moodle_dev_env')) {
+            $play = new install_plugins($this->load_plugins_to_install());
+            $play->play();
         }
 
         // Install german locale
@@ -135,14 +135,16 @@ class playbook extends base_playbook {
         $play->play();
     }
 
+    /**
+     * @throws invalid_parameter_exception
+     * @returns install_plugins_model[]
+     */
     private function load_plugins_to_install(): array {
         $filePath = __DIR__ . '/../files/plugins.json';
         $jsonContent = file_get_contents($filePath);
         $pluginsArray = json_decode($jsonContent, true);
 
-        return array_map(/**
-         * @throws invalid_parameter_exception
-         */ function ($plugin) {
+        return array_map(function ($plugin) {
             if (isset($plugin['git_project'])) {
                 return new install_plugins_model(
                     $plugin['version'],
