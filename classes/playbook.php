@@ -1,0 +1,170 @@
+<?php
+
+namespace playbook_adler;
+
+use base_playbook;
+use Exception;
+use invalid_parameter_exception;
+use local_declarativesetup\local\play\config\config;
+use local_declarativesetup\local\play\config\models\config_model;
+use local_declarativesetup\local\play\exceptions\not_implemented_exception;
+use local_declarativesetup\local\play\exceptions\play_was_already_played_exception;
+use local_declarativesetup\local\play\exceptions\play_was_not_played_exception;
+use local_declarativesetup\local\play\install_plugins\install_plugins;
+use local_declarativesetup\local\play\install_plugins\models\install_plugins_model;
+use local_declarativesetup\local\play\language\language;
+use local_declarativesetup\local\play\language\models\language_model;
+use local_declarativesetup\local\play\logos\logos;
+use local_declarativesetup\local\play\logos\models\logo_model;
+use local_declarativesetup\local\play\role\models\role_model;
+use local_declarativesetup\local\play\role\role;
+use local_declarativesetup\local\play\user\models\user_model;
+use local_declarativesetup\local\play\user\user;
+use local_declarativesetup\local\play\web_services\models\web_services_model;
+use local_declarativesetup\local\play\web_services\web_services;
+use moodle_exception;
+
+// TODO: refactor playbooks:
+// - somehow support roles. likely a constructor parameter that takes an array of roles (eg role e2e_test or dev_env)
+// - create a base playbook class that contains the common logic (constructor takes roles, logic defined in run(), failed()
+class playbook extends base_playbook {
+    /**
+     * @throws play_was_not_played_exception
+     * @throws not_implemented_exception
+     * @throws play_was_already_played_exception
+     * @throws invalid_parameter_exception
+     * @throws moodle_exception
+     */
+    protected function playbook_implementation(): void {
+        // first ensure maintenance mode is active. A playbook can take some time and users should not use
+        // the system while it is being configured.
+        $play = new config([
+            new config_model('maintenance_enabled', 1),
+            new config_model('maintenance_message', 'This site is currently under maintenance. Please try again later.'),
+        ]);
+        $play->play();
+
+        // Install plugins
+        if (!$this->has_role('moodle_dev_env') {
+        $play = new install_plugins($this->load_plugins_to_install());
+        $play->play();
+        }
+
+        // Install german locale
+        $play = new language([
+            new language_model('de'),
+            new language_model('en'),
+        ]);
+        $play->play();
+
+        // Create adler_manager role
+        $play = new role(new role_model(
+            'adler_manager',
+            [
+                'moodle/course:delete' => CAP_ALLOW,
+                'moodle/course:enrolconfig' => CAP_ALLOW,
+                'moodle/question:add' => CAP_ALLOW,
+                'moodle/question:managecategory' => CAP_ALLOW,
+                'moodle/restore:configure' => CAP_ALLOW,
+                'moodle/restore:restoreactivity' => CAP_ALLOW,
+                'moodle/restore:restorecourse' => CAP_ALLOW,
+                'moodle/restore:restoresection' => CAP_ALLOW,
+                'moodle/restore:restoretargetimport' => CAP_ALLOW,
+                'moodle/restore:rolldates' => CAP_ALLOW,
+                'moodle/restore:uploadfile' => CAP_ALLOW,
+                'moodle/restore:userinfo' => CAP_ALLOW,
+                'moodle/restore:viewautomatedfilearea' => CAP_ALLOW,
+                'moodle/h5p:deploy' => CAP_ALLOW,
+            ],
+            [CONTEXT_COURSECAT],
+        ));
+        $play->play();
+
+        // enable web services
+        if ($this->has_role('integration_test')) {
+            $play = new web_services(new web_services_model(
+                web_services_model::STATE_ENABLED,
+                ['rest'],
+                enable_moodle_mobile_service: web_services_model::STATE_ENABLED
+            ));
+        } else {
+            $play = new web_services(new web_services_model(
+                web_services_model::STATE_ENABLED,
+                ['rest']
+            ));
+        }
+        $play->play();
+
+        $play = new role(new role_model(
+            'user',
+            [
+                'moodle/webservice:createtoken' => CAP_ALLOW,
+                'webservice/rest:use' => CAP_ALLOW,
+            ],
+            null,
+            false
+        ));
+        $play->play();
+
+        $play = new logos(new logo_model(
+            __DIR__ . '/../files/logos/22-04-20_adler_logo_3d_long.png',
+            __DIR__ . '/../files/logos/AdLer_Logo.png',
+            __DIR__ . '/../files/logos/AdLer_Logo_favicon.png',
+        ));
+        $play->play();
+
+        if ($this->has_role('test_users')) {
+            // Create test users
+            $play = new user(new user_model(
+                'manager',
+                $this->get_environment_variable('MANAGER_PASSWORD'),
+                system_roles: ['adler_manager'],
+            ));
+            $play->play();
+            $play = new user(new user_model(
+                'student',
+                $this->get_environment_variable('STUDENT_PASSWORD'),
+            ));
+            $play->play();
+        }
+
+        // Now disable maintenance mode again.
+        $play = new config([
+            new config_model('maintenance_enabled', 0),
+        ]);
+        $play->play();
+    }
+
+    private function load_plugins_to_install(): array {
+        $filePath = __DIR__ . '/../files/plugins.json';
+        $jsonContent = file_get_contents($filePath);
+        $pluginsArray = json_decode($jsonContent, true);
+
+        return array_map(/**
+         * @throws invalid_parameter_exception
+         */ function ($plugin) {
+            if (isset($plugin['git_project'])) {
+                return new install_plugins_model(
+                    $plugin['version'],
+                    $plugin['name'],
+                    $plugin['git_project']
+                );
+            }
+
+            return new install_plugins_model(
+                $plugin['version'],
+                $plugin['name'],
+                null,
+                $plugin['package_repo']
+            );
+        }, $pluginsArray);
+    }
+
+    protected function failed(Exception $e): void {
+        $play = new config([
+            new config_model('maintenance_enabled', 1),
+            new config_model('maintenance_message', 'This site is currently under maintenance. Please try again later.'),
+        ]);
+        $play->play();
+    }
+}
