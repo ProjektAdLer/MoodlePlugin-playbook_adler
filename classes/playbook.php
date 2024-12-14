@@ -2,11 +2,14 @@
 
 namespace playbook_adler;
 
-use base_playbook;
 use Exception;
 use invalid_parameter_exception;
+use local_declarativesetup\local\base_playbook;
 use local_declarativesetup\local\play\config\config;
 use local_declarativesetup\local\play\config\models\config_model;
+use local_declarativesetup\local\play\course_category\course_category;
+use local_declarativesetup\local\play\course_category\models\course_category_model;
+use local_declarativesetup\local\play\course_category\models\role_user_model;
 use local_declarativesetup\local\play\exceptions\not_implemented_exception;
 use local_declarativesetup\local\play\exceptions\play_was_already_played_exception;
 use local_declarativesetup\local\play\exceptions\play_was_not_played_exception;
@@ -24,9 +27,6 @@ use local_declarativesetup\local\play\web_services\models\web_services_model;
 use local_declarativesetup\local\play\web_services\web_services;
 use moodle_exception;
 
-// TODO: refactor playbooks:
-// - somehow support roles. likely a constructor parameter that takes an array of roles (eg role e2e_test or dev_env)
-// - create a base playbook class that contains the common logic (constructor takes roles, logic defined in run(), failed()
 class playbook extends base_playbook {
     /**
      * @throws play_was_not_played_exception
@@ -118,12 +118,21 @@ class playbook extends base_playbook {
             $play = new user(new user_model(
                 'manager',
                 $this->get_environment_variable('MANAGER_PASSWORD'),
-                system_roles: ['adler_manager'],
             ));
             $play->play();
             $play = new user(new user_model(
                 'student',
                 $this->get_environment_variable('STUDENT_PASSWORD'),
+            ));
+            $play->play();
+
+            // create adler course category for test users
+            $play = new course_category(new course_category_model(
+                '/adler/manager',
+                users: [
+                    new role_user_model('manager', ['adler_manager']),
+                    new role_user_model('student', []),
+                ],
             ));
             $play->play();
         }
