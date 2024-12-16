@@ -145,12 +145,15 @@ class playbook extends base_playbook {
     }
 
     /**
-     * @throws invalid_parameter_exception
+     * @throws moodle_exception
      * @returns install_plugins_model[]
      */
     private function load_plugins_to_install(): array {
         $filePath = __DIR__ . '/../files/plugins.json';
         $jsonContent = file_get_contents($filePath);
+        if ($jsonContent === false) {
+            throw new moodle_exception('Failed to read files/plugins.json. Does it exist?');
+        }
         $pluginsArray = json_decode($jsonContent, true);
 
         return array_map(function ($plugin) {

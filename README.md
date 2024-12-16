@@ -10,3 +10,11 @@ The following roles are available:
 The following environment variables are used:
 - DECLARATIVE_SETUP_MANAGER_PASSWORD: Password for the manager user
 - DECLARATIVE_SETUP_STUDENT_PASSWORD: Password for the student user
+
+## files/plugins.json
+This file is required if `moodle_dev_env` role is not used. Get the current version from
+[ProjektAdLer/MoodleAdlerLMS/files/plugin.json](https://github.com/ProjektAdLer/MoodleAdlerLMS/blob/main/plugins.json).
+See plugins.json.sample for an example.
+
+If this plugin is used in the [AdLer LMS Moodle image](https://github.com/ProjektAdLer/MoodleAdlerLMS), the plugin.json
+file is automatically copied to the `files` directory.
