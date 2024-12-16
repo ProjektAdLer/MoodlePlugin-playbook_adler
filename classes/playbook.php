@@ -157,19 +157,10 @@ class playbook extends base_playbook {
         $pluginsArray = json_decode($jsonContent, true);
 
         return array_map(function ($plugin) {
-            if (isset($plugin['git_project'])) {
-                return new install_plugins_model(
-                    $plugin['version'],
-                    $plugin['name'],
-                    $plugin['git_project']
-                );
-            }
-
             return new install_plugins_model(
                 $plugin['version'],
                 $plugin['name'],
                 null,
-                $plugin['package_repo']
             );
         }, $pluginsArray);
     }
