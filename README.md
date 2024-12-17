@@ -18,3 +18,8 @@ See plugins.json.sample for an example.
 
 If this plugin is used in the [AdLer LMS Moodle image](https://github.com/ProjektAdLer/MoodleAdlerLMS), the plugin.json
 file is automatically copied to the `files` directory.
+
+## Kompabilität
+Folgende Versionen werden unterstützt (mit mariadb und postresql getestet):
+
+siehe [plugin_compatibility.json](plugin_compatibility.json)
