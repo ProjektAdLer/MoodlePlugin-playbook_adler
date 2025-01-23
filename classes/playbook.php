@@ -160,7 +160,7 @@ class playbook extends base_playbook {
             return new install_plugins_model(
                 $plugin['version'],
                 $plugin['name'],
-                null,
+                $plugin['package_repo'],
             );
         }, $pluginsArray);
     }
