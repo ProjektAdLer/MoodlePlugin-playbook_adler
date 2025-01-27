@@ -3,15 +3,18 @@
 This playbook configures a moodle instance with AdLer.
 
 The following roles are available:
-- test_users: Creates test users for manual use
-- moodle_dev_env: For moodle development (don't install plugins)
-- integration_test: For integration and end-to-end tests (activate mobile services, create test users for automated tests)
-
-The following environment variables are used:
-- DECLARATIVE_SETUP_MANAGER_PASSWORD: Password for the manager user (role: test_users)
-- DECLARATIVE_SETUP_STUDENT_PASSWORD: Password for the student user (role: test_users)
-- DECLERATIVE_SETUP_INTEGRATION_TEST_MANAGER_PASSWORD: Password for the integration test manager user (role: integration_test)
-- DECLERATIVE_SETUP_INTEGRATION_TEST_STUDENT_PASSWORD: Password for the integration test student user (role: integration_test)
+- *test_users*: Creates test users for manual use
+  - usernames: manager, student
+  - environment variables: 
+    - DECLARATIVE_SETUP_MANAGER_PASSWORD: Password for the manager user
+    - DECLARATIVE_SETUP_STUDENT_PASSWORD: Password for the student user
+- *moodle_dev_env*: For moodle development (don't install plugins)
+- *integration_test*: For integration and end-to-end tests 
+  - activate mobile services
+  - create test users for automated tests (integration_test_manager, integration_test_student)
+  - environment variables:
+    - DECLERATIVE_SETUP_INTEGRATION_TEST_MANAGER_PASSWORD: Password for the integration test manager user
+    - DECLERATIVE_SETUP_INTEGRATION_TEST_STUDENT_PASSWORD: Password for the integration test student user
 
 ## files/plugins.json
 This file is required if `moodle_dev_env` role is not used. Get the current version from

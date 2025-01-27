@@ -116,12 +116,12 @@ class playbook extends base_playbook {
         if ($this->has_role('integration_test')) {
             // Create test users
             $play = new user(new user_model(
-                'manager',
+                'integration_test_manager',
                 $this->get_environment_variable('INTEGRATION_TEST_MANAGER_PASSWORD'),
             ));
             $play->play();
             $play = new user(new user_model(
-                'student',
+                'integration_test_student',
                 $this->get_environment_variable('INTEGRATION_TEST_STUDENT_PASSWORD'),
             ));
             $play->play();

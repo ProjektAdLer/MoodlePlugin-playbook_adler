@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'playbook_adler';
-$plugin->release = '0.1.0';
+$plugin->release = '0.2.1';
 $plugin->version = 2024121000;
 $plugin->requires = 2024042200;
 $plugin->maturity = MATURITY_STABLE;
