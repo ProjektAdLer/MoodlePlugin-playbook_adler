@@ -113,6 +113,30 @@ class playbook extends base_playbook {
         ));
         $play->play();
 
+        if ($this->has_role('integration_test')) {
+            // Create test users
+            $play = new user(new user_model(
+                'manager',
+                $this->get_environment_variable('INTEGRATION_TEST_MANAGER_PASSWORD'),
+            ));
+            $play->play();
+            $play = new user(new user_model(
+                'student',
+                $this->get_environment_variable('INTEGRATION_TEST_STUDENT_PASSWORD'),
+            ));
+            $play->play();
+
+            // create adler course category for test users
+            $play = new course_category(new course_category_model(
+                '/adler/integration_test',
+                users: [
+                    new role_user_model('integration_test_manager', ['adler_manager']),
+                    new role_user_model('integration_test_student', []),
+                ],
+            ));
+            $play->play();
+        }
+
         if ($this->has_role('test_users')) {
             // Create test users
             $play = new user(new user_model(
