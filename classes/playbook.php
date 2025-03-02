@@ -161,6 +161,14 @@ class playbook extends base_playbook {
             $play->play();
         }
 
+        // Configure privacy settings
+        $play = new config([
+            new config_model('contactdataprotectionofficer', true, plugin: 'tool_dataprivacy'),
+            new config_model('automaticdataexportapproval', true, plugin: 'tool_dataprivacy'),
+            new config_model('automaticdatadeletionapproval', true, plugin: 'tool_dataprivacy'),
+        ]);
+        $play->play();
+
         // Now disable maintenance mode again.
         $play = new config([
             new config_model('maintenance_enabled', 0),
