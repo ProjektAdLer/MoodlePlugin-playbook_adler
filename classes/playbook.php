@@ -6,7 +6,7 @@ use Exception;
 use invalid_parameter_exception;
 use local_declarativesetup\local\base_playbook;
 use local_declarativesetup\local\play\config\config;
-use local_declarativesetup\local\play\config\models\config_model;
+use local_declarativesetup\local\play\config\models\simple_config_model;
 use local_declarativesetup\local\play\course_category\course_category;
 use local_declarativesetup\local\play\course_category\models\course_category_model;
 use local_declarativesetup\local\play\course_category\models\role_user_model;
@@ -39,8 +39,8 @@ class playbook extends base_playbook {
         // first ensure maintenance mode is active. A playbook can take some time and users should not use
         // the system while it is being configured.
         $play = new config([
-            new config_model('maintenance_enabled', 1),
-            new config_model('maintenance_message', 'This site is currently under maintenance. Please try again later.'),
+            new simple_config_model('maintenance_enabled', 1),
+            new simple_config_model('maintenance_message', 'This site is currently under maintenance. Please try again later.'),
         ]);
         $play->play();
 
@@ -163,15 +163,15 @@ class playbook extends base_playbook {
 
         // Configure privacy settings
         $play = new config([
-            new config_model('contactdataprotectionofficer', true, plugin: 'tool_dataprivacy'),
-            new config_model('automaticdataexportapproval', true, plugin: 'tool_dataprivacy'),
-            new config_model('automaticdatadeletionapproval', true, plugin: 'tool_dataprivacy'),
+            new simple_config_model('contactdataprotectionofficer', true, plugin: 'tool_dataprivacy'),
+            new simple_config_model('automaticdataexportapproval', true, plugin: 'tool_dataprivacy'),
+            new simple_config_model('automaticdatadeletionapproval', true, plugin: 'tool_dataprivacy'),
         ]);
         $play->play();
 
         // Now disable maintenance mode again.
         $play = new config([
-            new config_model('maintenance_enabled', 0),
+            new simple_config_model('maintenance_enabled', 0),
         ]);
         $play->play();
     }
@@ -199,8 +199,8 @@ class playbook extends base_playbook {
 
     protected function failed(Exception $e): void {
         $play = new config([
-            new config_model('maintenance_enabled', 1),
-            new config_model('maintenance_message', 'This site is currently under maintenance. Please try again later.'),
+            new simple_config_model('maintenance_enabled', 1),
+            new simple_config_model('maintenance_message', 'This site is currently under maintenance. Please try again later.'),
         ]);
         $play->play();
     }
