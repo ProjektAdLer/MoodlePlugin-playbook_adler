@@ -26,3 +26,4 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'AdLer playbook';
+$string['privacy:metadata'] = 'The AdLer playbook plugin does not store any data.';
