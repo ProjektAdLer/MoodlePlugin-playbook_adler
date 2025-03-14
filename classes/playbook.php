@@ -6,6 +6,7 @@ use Exception;
 use invalid_parameter_exception;
 use local_declarativesetup\local\base_playbook;
 use local_declarativesetup\local\play\config\config;
+use local_declarativesetup\local\play\config\models\array_config_model;
 use local_declarativesetup\local\play\config\models\simple_config_model;
 use local_declarativesetup\local\play\course_category\course_category;
 use local_declarativesetup\local\play\course_category\models\course_category_model;
@@ -106,6 +107,16 @@ class playbook extends base_playbook {
         ));
         $play->play();
 
+        // enable webservice auth with username/password for site admin auth login endpoint
+        $play = new config([
+            new array_config_model(
+                'auth',
+                ['webservice']
+            )
+        ]);
+        $play->play();
+
+        // set adler theming
         $play = new logos(new logo_model(
             __DIR__ . '/../files/logos/22-04-20_adler_logo_3d_long.png',
             __DIR__ . '/../files/logos/AdLer_Logo.png',
