@@ -25,10 +25,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'playbook_adler';
-$plugin->release = '0.2.1-dev';
-$plugin->version = 2025031300;
+$plugin->release = '0.3.0';
+$plugin->version = 2025031600;
 $plugin->requires = 2024042200;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'local_declarativesetup' => 2025031300,
 ];
