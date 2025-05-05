@@ -76,6 +76,7 @@ class playbook extends base_playbook {
                 'moodle/restore:userinfo' => CAP_ALLOW,
                 'moodle/restore:viewautomatedfilearea' => CAP_ALLOW,
                 'moodle/h5p:deploy' => CAP_ALLOW,
+                'moodle/h5p:updatelibraries' => CAP_ALLOW,
             ],
             [CONTEXT_COURSECAT],
         ));
